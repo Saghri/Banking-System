@@ -1,6 +1,6 @@
-# gui.py
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 from customer import CustomerManager
 from transaction import TransactionManager
 from loan import LoanManager
@@ -9,77 +9,109 @@ class BankingApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Banking System")
+        self.root.geometry("700x600")  # Set initial window size
         self.customer_manager = CustomerManager()
         self.transaction_manager = TransactionManager(self.customer_manager)
         self.loan_manager = LoanManager()
+
+        # Create a canvas and a scrollbar
+        self.canvas = tk.Canvas(root)
+        self.scrollbar = ttk.Scrollbar(root, orient="vertical", command=self.canvas.yview)
+        self.scrollable_frame = ttk.Frame(self.canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.config(yscrollcommand=self.scrollbar.set)
+
         self.create_widgets()
 
     def create_widgets(self):
-        # Frame for customer operations
-        customer_frame = tk.Frame(self.root)
-        customer_frame.pack(pady=10)
+        # Styling for ttk widgets
+        style = ttk.Style()
+        style.configure('TLabel', padding=5)
+        style.configure('TButton', padding=5)
+        style.configure('TEntry', padding=5)
+        style.configure('TText', padding=5)
 
-        # Account Number
-        tk.Label(customer_frame, text="Account Number:").grid(row=0, column=0)
-        self.acc_number = tk.Entry(customer_frame)
-        self.acc_number.grid(row=0, column=1)
+        # Frame for Customer Operations
+        customer_frame = ttk.Frame(self.scrollable_frame, padding="15")
+        customer_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        # Name
-        tk.Label(customer_frame, text="Name:").grid(row=1, column=0)
-        self.name = tk.Entry(customer_frame)
-        self.name.grid(row=1, column=1)
+        ttk.Label(customer_frame, text="Account Number:").grid(row=0, column=0, sticky="w")
+        self.acc_number = ttk.Entry(customer_frame, width=30)
+        self.acc_number.grid(row=0, column=1, sticky="ew")
 
-        # Balance
-        tk.Label(customer_frame, text="Balance:").grid(row=2, column=0)
-        self.balance = tk.Entry(customer_frame)
-        self.balance.grid(row=2, column=1)
+        ttk.Label(customer_frame, text="Name:").grid(row=1, column=0, sticky="w")
+        self.name = ttk.Entry(customer_frame, width=30)
+        self.name.grid(row=1, column=1, sticky="ew")
 
-        # Contact Info
-        tk.Label(customer_frame, text="Contact Info:").grid(row=3, column=0)
-        self.contact_info = tk.Entry(customer_frame)
-        self.contact_info.grid(row=3, column=1)
+        ttk.Label(customer_frame, text="Balance:").grid(row=2, column=0, sticky="w")
+        self.balance = ttk.Entry(customer_frame, width=30)
+        self.balance.grid(row=2, column=1, sticky="ew")
 
-        # Buttons for customer operations
-        tk.Button(customer_frame, text="Add Customer", command=self.add_customer).grid(row=4, column=0, columnspan=2, pady=5)
-        tk.Button(customer_frame, text="Delete Customer", command=self.delete_customer).grid(row=5, column=0, columnspan=2)
+        ttk.Label(customer_frame, text="Contact Info:").grid(row=3, column=0, sticky="w")
+        self.contact_info = ttk.Entry(customer_frame, width=30)
+        self.contact_info.grid(row=3, column=1, sticky="ew")
 
-        # Frame for transactions
-        transaction_frame = tk.Frame(self.root)
-        transaction_frame.pack(pady=10)
+        ttk.Button(customer_frame, text="Add Customer", command=self.add_customer).grid(row=4, column=0, columnspan=2, pady=10, sticky="ew")
+        ttk.Button(customer_frame, text="Delete Customer", command=self.delete_customer).grid(row=5, column=0, columnspan=2, pady=10, sticky="ew")
+        ttk.Button(customer_frame, text="View Customer Details", command=self.view_customer_details).grid(row=6, column=0, columnspan=2, pady=10, sticky="ew")
 
-        # Deposit
-        tk.Label(transaction_frame, text="Amount to Deposit:").grid(row=0, column=0)
-        self.deposit_amount = tk.Entry(transaction_frame)
-        self.deposit_amount.grid(row=0, column=1)
-        tk.Button(transaction_frame, text="Deposit", command=self.deposit).grid(row=1, column=0, columnspan=2)
+        # Frame for Transaction Operations
+        transaction_frame = ttk.Frame(self.scrollable_frame, padding="15")
+        transaction_frame.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
-        # Withdraw
-        tk.Label(transaction_frame, text="Amount to Withdraw:").grid(row=2, column=0)
-        self.withdraw_amount = tk.Entry(transaction_frame)
-        self.withdraw_amount.grid(row=2, column=1)
-        tk.Button(transaction_frame, text="Withdraw", command=self.withdraw).grid(row=3, column=0, columnspan=2)
+        ttk.Label(transaction_frame, text="Amount to Deposit:").grid(row=0, column=0, sticky="w")
+        self.deposit_amount = ttk.Entry(transaction_frame, width=30)
+        self.deposit_amount.grid(row=0, column=1, sticky="ew")
 
-        # Frame for loan
-        loan_frame = tk.Frame(self.root)
-        loan_frame.pack(pady=10)
+        ttk.Button(transaction_frame, text="Deposit", command=self.deposit).grid(row=1, column=0, columnspan=2, pady=10, sticky="ew")
 
-        # Loan Amount
-        tk.Label(loan_frame, text="Loan Amount:").grid(row=0, column=0)
-        self.loan_amount = tk.Entry(loan_frame)
-        self.loan_amount.grid(row=0, column=1)
+        ttk.Label(transaction_frame, text="Amount to Withdraw:").grid(row=2, column=0, sticky="w")
+        self.withdraw_amount = ttk.Entry(transaction_frame, width=30)
+        self.withdraw_amount.grid(row=2, column=1, sticky="ew")
 
-        # Interest Rate
-        tk.Label(loan_frame, text="Interest Rate (%):").grid(row=1, column=0)
-        self.loan_rate = tk.Entry(loan_frame)
-        self.loan_rate.grid(row=1, column=1)
+        ttk.Button(transaction_frame, text="Withdraw", command=self.withdraw).grid(row=3, column=0, columnspan=2, pady=10, sticky="ew")
 
-        # Term
-        tk.Label(loan_frame, text="Term (years):").grid(row=2, column=0)
-        self.loan_term = tk.Entry(loan_frame)
-        self.loan_term.grid(row=2, column=1)
+        # Frame for Loan Calculations
+        loan_frame = ttk.Frame(self.scrollable_frame, padding="15")
+        loan_frame.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
 
-        # Calculate Loan
-        tk.Button(loan_frame, text="Calculate Loan", command=self.calculate_loan).grid(row=3, column=0, columnspan=2)
+        ttk.Label(loan_frame, text="Loan Amount:").grid(row=0, column=0, sticky="w")
+        self.loan_amount = ttk.Entry(loan_frame, width=30)
+        self.loan_amount.grid(row=0, column=1, sticky="ew")
+
+        ttk.Label(loan_frame, text="Interest Rate (%):").grid(row=1, column=0, sticky="w")
+        self.loan_rate = ttk.Entry(loan_frame, width=30)
+        self.loan_rate.grid(row=1, column=1, sticky="ew")
+
+        ttk.Label(loan_frame, text="Term (years):").grid(row=2, column=0, sticky="w")
+        self.loan_term = ttk.Entry(loan_frame, width=30)
+        self.loan_term.grid(row=2, column=1, sticky="ew")
+
+        ttk.Button(loan_frame, text="Calculate Loan", command=self.calculate_loan).grid(row=3, column=0, columnspan=2, pady=10, sticky="ew")
+
+        # Frame for Customer Details
+        details_frame = ttk.Frame(self.scrollable_frame, padding="15")
+        details_frame.grid(row=3, column=0, padx=10, pady=10, sticky="nsew")
+
+        ttk.Label(details_frame, text="Customer Details:").grid(row=0, column=0, sticky="w")
+        self.customer_details = tk.Text(details_frame, width=80, height=10, wrap=tk.WORD)
+        self.customer_details.grid(row=1, column=0, sticky="nsew")
+        self.customer_details.config(state=tk.DISABLED)  # Make text area read-only
+
+        # Adjust row/column weights
+        self.scrollable_frame.grid_rowconfigure(0, weight=1)
+        self.scrollable_frame.grid_rowconfigure(1, weight=1)
+        self.scrollable_frame.grid_rowconfigure(2, weight=1)
+        self.scrollable_frame.grid_rowconfigure(3, weight=1)
+        self.scrollable_frame.grid_columnconfigure(0, weight=1)
 
     def add_customer(self):
         try:
@@ -97,6 +129,17 @@ class BankingApp:
             account_number = self.acc_number.get()
             self.customer_manager.delete_customer(account_number)
             messagebox.showinfo("Success", "Customer deleted successfully!")
+        except ValueError as e:
+            messagebox.showerror("Error", str(e))
+
+    def view_customer_details(self):
+        try:
+            account_number = self.acc_number.get()
+            details = self.customer_manager.get_customer_details(account_number)
+            self.customer_details.config(state=tk.NORMAL)
+            self.customer_details.delete(1.0, tk.END)
+            self.customer_details.insert(tk.END, details)
+            self.customer_details.config(state=tk.DISABLED)
         except ValueError as e:
             messagebox.showerror("Error", str(e))
 

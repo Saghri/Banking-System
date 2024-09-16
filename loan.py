@@ -1,4 +1,3 @@
-# loan.py
 class Loan:
     def __init__(self, loan_type, principal, rate, term):
         self.loan_type = loan_type

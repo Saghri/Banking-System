@@ -45,3 +45,12 @@ class CustomerManager:
 
     def get_customer(self, account_number):
         return self.customers.get(account_number, None)
+    
+    def get_customer_details(self, account_number):
+        customer = self.customers.get(account_number)
+        if not customer:
+            raise ValueError("Customer does not exist!")
+        return (f"Account Number: {customer['account_number']}\n"
+                f"Name: {customer['name']}\n"
+                f"Balance: {customer['balance']}\n"
+                f"Contact Info: {customer['contact_info']}")

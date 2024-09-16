@@ -1,4 +1,3 @@
-# transaction.py
 class TransactionManager:
     def __init__(self, customer_manager):
         self.customer_manager = customer_manager
